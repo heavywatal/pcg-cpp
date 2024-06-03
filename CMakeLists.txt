@@ -1,0 +1,35 @@
+cmake_minimum_required(VERSION 3.15)
+project(pcg
+  VERSION 0.98.1
+  LANGUAGES CXX)
+
+include(CMakePrintHelpers)
+include(GNUInstallDirs)
+
+add_library(${PROJECT_NAME} INTERFACE)
+add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
+target_include_directories(${PROJECT_NAME} INTERFACE
+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+)
+target_compile_features(${PROJECT_NAME} INTERFACE cxx_std_17)
+
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
+)
+install(TARGETS ${PROJECT_NAME}
+  EXPORT ${PROJECT_NAME}-config
+)
+install(EXPORT ${PROJECT_NAME}-config
+  DESTINATION ${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}
+  NAMESPACE ${PROJECT_NAME}::
+)
+
+set(VERSION_CONFIG ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config-version.cmake)
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+  ${VERSION_CONFIG} COMPATIBILITY AnyNewerVersion
+)
+install(FILES ${VERSION_CONFIG}
+  DESTINATION ${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}
+)
